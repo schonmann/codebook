@@ -65,6 +65,17 @@ func (c GzipCompressor) Decompress(data []byte) ([]byte, error) {
 	return bufout.Bytes(), nil
 }
 
+//NoneCompressor is a compressor implementation. Just to keep the same interface for cases in which compression is optional.
+type NoneCompressor struct{}
+
+func (c NoneCompressor) Compress(data []byte) ([]byte, error) {
+	return data, nil
+}
+
+func (c NoneCompressor) Decompress(data []byte) ([]byte, error) {
+	return data, nil
+}
+
 func main() {
   	compressor := CreateCompressor(gzipCompressor)
   	foo := "I will be compressed!"
@@ -72,5 +83,5 @@ func main() {
   	if err != nil {
 		panic("Something went bad!")
   	}
-  	fmt.Printf("Compressed foo: %s\n", string(bar))
+	fmt.Printf("Compressed foo (gzip): %s\n", string(bar))
 }
