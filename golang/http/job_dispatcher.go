@@ -30,48 +30,29 @@ func init() {
 
 type Job struct {
 	Name string
-	Duration time.Duration
+	Duration time.Duration	
 }
 
-type Dispatcher struct {
-	jobQueue chan Job
-	maxWorkers int
-}
-
-func (d Dispatcher) Start() {
-	for i := 1; i <= d.maxWorkers; i++ {
-		go func(i int) {
-			for j := range d.jobQueue {
-				go func(job Job) {
-					logger.Infof("Started job '%s'...", job.Name)
-					time.Sleep(job.Duration)
-					logger.Infof("Finished job '%s'!", job.Name)
-				}(j)
-			}
-		}(i)
-	}
-}
-
-func (d Dispatcher) ScheduleJob(j Job) {
-	d.jobQueue <- j
-	logger.Infof("Job '%s' scheduled...", j.Name)
-}
-
-func NewDispatcher(maxWorkers, maxQueueSize int) *Dispatcher{
-	return &Dispatcher{
-		maxWorkers: maxWorkers,
-		jobQueue: make(chan Job, maxQueueSize),
-	}
+func doWork(job Job) {
+	logger.Infof("Started job '%s'...", job.Name)
+	time.Sleep(job.Duration)
+	logger.Infof("Finished job '%s'!", job.Name)
 }
 
 func main() {
-	dispatcher := NewDispatcher(*maxWorkers, *maxQueueSize)
-	dispatcher.Start()
-	http.HandleFunc("/startJob", func (writer http.ResponseWriter, request * http.Request) {
-		dispatcher.ScheduleJob(Job {
+	jobs := make(chan Job, *maxQueueSize)
+	for i := 1; i <= *maxWorkers; i++ {
+		go func(i int) {
+			for j := range jobs {
+				go doWork(j)
+			}
+		}(i)
+	}
+	http.HandleFunc("/work", func (writer http.ResponseWriter, request * http.Request) {
+		jobs <- Job {
 			Name: request.URL.Path,
 			Duration: time.Second,
-		})
+		}
 	})
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d",*serverPort), nil))
 }
