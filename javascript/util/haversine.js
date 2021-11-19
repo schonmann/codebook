@@ -16,17 +16,15 @@ if (typeof (Number.prototype.toRadians) === "undefined") {
  * 
  */
 
-function haversine(x1, y1, x2, y2) {    
-
-    var R = 6371;
-    var dLat = (x2 - x1).toRadians();
-    var dLng = (y2 - y1).toRadians();
-    var a =
+const haversine(x1, y1, x2, y2) = () => {    
+    const R = 6371;
+    const dLat = (x2 - x1).toRadians();
+    const dLng = (y2 - y1).toRadians();
+    const a =
         Math.pow(Math.sin(dLat / 2), 2) +
         Math.pow(Math.sin(dLng / 2), 2) *
         Math.cos((x1).toRadians()) * Math.cos((x2).toRadians());
-
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
     return d;
 }
