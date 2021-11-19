@@ -16,7 +16,7 @@ if (typeof (Number.prototype.toRadians) === "undefined") {
  * 
  */
 
-const haversine(x1, y1, x2, y2) = () => {    
+const haversine = (x1, y1, x2, y2) => {    
     const R = 6371;
     const dLat = (x2 - x1).toRadians();
     const dLng = (y2 - y1).toRadians();
